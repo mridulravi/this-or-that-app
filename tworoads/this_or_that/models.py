@@ -1,0 +1,34 @@
+from django.db import models
+
+class Strategy(models.Model):
+    strategyName = models.CharField(max_length=10)
+    def __unicode__(self):
+        return self.strategyName
+
+class Data(models.Model):
+    strategyID = models.ForeignKey(Strategy)
+    date = models.DateField()
+    logReturn = models.FloatField()
+    
+    class Meta:
+        #abstract = True
+        unique_together = ('strategyID', 'date')
+        ordering = ['date']
+        
+    def __unicode__(self):
+        return 'StrategyID: %s, Date: %s, Log Return: %f' % (self.strategyID.strategyName, str(self.date), self.logReturn)
+    
+class User(models.Model):
+	username = models.CharField(max_length=200)
+	age = models.IntegerField()
+	income = models.DecimalField(max_digits=15, decimal_places=2)
+	riskAppetite = models.DecimalField(max_digits=4, decimal_places=2)
+	savings = models.DecimalField(max_digits=4, decimal_places=2)
+	def __unicode__(self):
+		return 'username: %s, age: %u, income: %d, riskAppetite: %d, savings: %d' % (self.username, self.age, self.income, self.riskAppetite, self.savings)
+
+class Selects(models.Model):
+	sID = models.ForeignKey(Strategy)
+	uID = models.ForeignKey(User)
+	def __unicode__(self):
+		return 'sID: %s, uID: %s' % (self.sID.strategyName, self.uID.username)

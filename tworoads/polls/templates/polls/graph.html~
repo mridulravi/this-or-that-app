@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Line Graph</title>
+        <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.6.1.min.js"></script>
+        <script>
+        </script>
+    </head>
+    <body>
+        <canvas id="graph" width="300" height="200">   
+        </canvas> 
+    </body>
+</html>
