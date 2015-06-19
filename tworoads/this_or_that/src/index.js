@@ -1,9 +1,50 @@
     
 var AppBody = React.createClass({
 	
+	getInitialState: function() {
+        return {
+            firstID: '',
+            secondID: ''
+        };
+    },
+    
+    componentDidMount: function() {
+        $.ajax({
+			url: this.props.username + "/get_user_strategies/?format=json",
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				this.setState({
+				    firstID: data.firstID,
+				    secondID: data.secondID
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(err.toString());
+			}.bind(this)
+		});
+    },
+	
 	render: function() {
 		return (
-			<h1>App Body : {this.props.username}</h1>
+			//<h1>App Body : {this.props.username}</h1>
+			<div>
+				<div>
+					<StrategyOption ID = {this.state.firstID} />
+				</div>
+				<div>
+					<StrategyOption ID = {this.state.secondID} />
+				</div>
+				<div>
+					<form className="selectForm" onSubmit={this.handleRadioSubmit}>
+						<input type="radio" name="choice" ref="firstRadioButton" value={this.state.firstID} />
+						{this.state.firstID}
+						<input type="submit" value="Submit stratgy choice" />
+						<input type="radio" name="choice" ref="secondRadioButton" value={this.state.secondID} />
+						{this.state.secondID}
+					</form>
+				</div>
+			</div>
 		);
 	}
 });
@@ -18,14 +59,13 @@ var LoginForm = React.createClass({
 		}
 		
 		React.findDOMNode(this.refs.loginusername).value = '';
-		// TODO: send request to the server and on response call onUserLogin(response.loginStatus, response.username)
+		
 		$.ajax({
 			url: username + "/check_login/?format=json",
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
 				this.props.onUserLogin(data.loginStatus, data.username);
-				return;
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(err.toString());
@@ -73,14 +113,15 @@ var SignupForm = React.createClass({
 		if (!savings ) {
 			return;
 		}
-		// TODO: send request to the server and on response call onUserLogin(response.loginStatus, response.username)
+
 		$.ajax({
 			url: username + "/check_signup/?format=json",
 			dataType: 'json',
+			type: 'POST',
+			data: {'age': age, 'income': income, 'riskAppetite': riskAppetite, 'savings': savings},
 			cache: false,
 			success: function(data) {
 				this.props.onUserLogin(data.loginStatus, data.username);
-				return;
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(err.toString());

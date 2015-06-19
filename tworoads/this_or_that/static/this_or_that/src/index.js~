@@ -1,9 +1,138 @@
+var StrategyOption = React.createClass({
+	
+	getInitialState: function() {
+        return {
+        	log_returns: '',
+            netReturn: '',
+            annualizedReturn: '',
+            maxDrawdown: ''
+        };
+    },
+    
+    componentWillReceiveProps: function(nextProps) {
+    	console.log(nextProps.ID);
+    	alert(nextProps.ID);
+        $.ajax({
+			url: nextProps.ID + "/get_strategy_data/?format=json",
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				this.setState({
+				    log_returns: data.log_returns,
+				    netReturn: data.netReturn,
+				    annualizedReturn: data.annualizedReturn,
+				    maxDrawdown: data.maxDrawdown
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(err.toString());
+			}.bind(this)
+		});
+    },
+    
+	render: function() {
+		return (
+			<div>
+				{this.props.ID}
+				<br/>
+				{this.state.log_returns}
+				<br/>
+				{this.state.netReturn}
+				<br/>
+				{this.state.annualizedReturn}
+				<br/>
+				{this.state.maxDrawdown}
+			</div>
+		);
+	}
+});
     
 var AppBody = React.createClass({
 	
+	getInitialState: function() {
+        new_state = {
+            firstID: '',
+            secondID: ''
+        };
+        this.loadInitialState();
+        return new_state;
+    },
+    
+    loadInitialState: function() {
+        $.ajax({
+			url: this.props.username + "/get_user_strategies/?format=json",
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				var state = this.state;
+				state.firstID = data.firstID;
+				state.secondID = data.secondID;
+		    	this.setState(state);
+				/*this.setState({
+				    firstID: data.firstID,
+				    secondID: data.secondID
+				});*/
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(err.toString());
+			}.bind(this)
+		});
+    },
+	
+	handleRadioSubmit: function(e) {
+		e.preventDefault();
+		var firstRadioButton = React.findDOMNode(this.refs.firstRadioButton);
+		var secondRadioButton = React.findDOMNode(this.refs.secondRadioButton);
+		var clickedID = '';
+		if (firstRadioButton.checked) {
+			clickedID = firstRadioButton.value;
+		}
+		else if (secondRadioButton.checked) {
+			clickedID = secondRadioButton.value;
+		}
+		else {
+			alert("Please pick a strategy before submit !");
+			return;
+		}
+		
+		$.ajax({
+			url: this.props.username + "/" + clickedID + "/get_next_strategies/?format=json",
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				this.setState({
+					firstID: data.firstID,
+					secondID: data.secondID
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(err.toString());
+			}.bind(this)
+		});
+				
+		return;
+	},
+	
 	render: function() {
 		return (
-			<h1>App Body : {this.props.username}</h1>
+			<div>
+				<h1>Hi, {this.props.username}</h1>
+				<div>
+					<StrategyOption ID = {this.state.firstID} />
+				</div>
+				<div>
+					<StrategyOption ID = {this.state.secondID} />
+				</div>
+				<div>
+					<form className="selectForm" onSubmit={this.handleRadioSubmit}>
+						<input type="radio" name="choice" ref="firstRadioButton" value={this.state.firstID} />
+						{this.state.firstID}
+						<input type="submit" value="Submit stratgy choice" />
+						<input type="radio" name="choice" ref="secondRadioButton" value={this.state.secondID} />
+						{this.state.secondID}
+					</form>
+				</div>
+			</div>
 		);
 	}
 });
@@ -18,14 +147,13 @@ var LoginForm = React.createClass({
 		}
 		
 		React.findDOMNode(this.refs.loginusername).value = '';
-		// TODO: send request to the server and on response call onUserLogin(response.loginStatus, response.username)
+		
 		$.ajax({
 			url: username + "/check_login/?format=json",
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
 				this.props.onUserLogin(data.loginStatus, data.username);
-				return;
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(err.toString());
@@ -73,16 +201,15 @@ var SignupForm = React.createClass({
 		if (!savings ) {
 			return;
 		}
-		// TODO: send request to the server and on response call onUserLogin(response.loginStatus, response.username)
+
 		$.ajax({
 			url: username + "/check_signup/?format=json",
 			dataType: 'json',
 			type: 'POST',
-			data: {age: age, income: income, riskAppetite: riskAppetite, savings: savings},
+			data: {'age': age, 'income': income, 'riskAppetite': riskAppetite, 'savings': savings},
 			cache: false,
 			success: function(data) {
 				this.props.onUserLogin(data.loginStatus, data.username);
-				return;
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(err.toString());
