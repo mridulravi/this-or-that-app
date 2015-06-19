@@ -3,4 +3,4 @@ IGNORE
 INTO TABLE this_or_that_data FIELDS 
 TERMINATED BY ','
 (id, strategyID_id, @var, logReturn)
-SET date = STR_TO_DATE(@var,'%Y-%m-%d');
+SET date = STR_TO_DATE(@var,' %Y-%m-%d ');

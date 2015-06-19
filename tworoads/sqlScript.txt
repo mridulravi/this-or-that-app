@@ -1,4 +1,4 @@
-LOAD DATA LOCAL INFILE '~/../../home/mridul/tworoads/output.csv' 
+LOAD DATA LOCAL INFILE '~/../../home/mridul/this-or-that-app/tworoads/output.csv' 
 IGNORE 
 INTO TABLE this_or_that_data FIELDS 
 TERMINATED BY ','
