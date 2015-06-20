@@ -1,10 +1,22 @@
 from django.db import models
 import ast
+import json
 
 class Strategy(models.Model):
     strategyName = models.CharField(max_length=10)
+    
     def __unicode__(self):
         return self.strategyName
+        
+    def getNetReturn(self):
+    	return 78  
+	
+    def getAnnualizedReturn(self):
+		return 89 
+		
+    def getMaxDrawdown(self):
+    	return 11     	
+    	  
 
 class Data(models.Model):
     strategyID = models.ForeignKey(Strategy)
@@ -17,9 +29,11 @@ class Data(models.Model):
         ordering = ['date']
         
     def __unicode__(self):
-        return 'StrategyID: %s, Date: %s, Log Return: %f' % (self.strategyID.strategyName, str(self.date), self.logReturn)
-    
-
+        'StrategyID: %s, Date: %s, Log Return: %f' % (self.strategyID.strategyName, str(self.date), self.logReturn)
+        
+    def to_json(self):
+        return {'sID':self.id, 'date':str(self.date), 'log_return':self.logReturn}
+        
 class SeparatedValuesField(models.TextField):
     __metaclass__ = models.SubfieldBase
 
@@ -33,7 +47,7 @@ class SeparatedValuesField(models.TextField):
             return value
         return value.split(self.token)
 
-    def get_db_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
         if not value: return
         assert(isinstance(value, list) or isinstance(value, tuple))
         return self.token.join([unicode(s) for s in value])
@@ -49,6 +63,7 @@ class User(models.Model):
 	riskAppetite = models.DecimalField(max_digits=4, decimal_places=2)
 	savings = models.DecimalField(max_digits=4, decimal_places=2)
 	stratChoiceList = SeparatedValuesField()
+	
 	def __unicode__(self):
 		return 'username: %s, age: %u, income: %d, riskAppetite: %d, savings: %d' % (self.username, self.age, self.income, self.riskAppetite, self.savings)
 

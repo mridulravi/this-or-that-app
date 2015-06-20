@@ -10,15 +10,15 @@ var StrategyOption = React.createClass({
     },
     
     componentWillReceiveProps: function(nextProps) {
-    	console.log(nextProps.ID);
-    	alert(nextProps.ID);
+    	//console.log(nextProps.ID);
+    	//alert(nextProps.ID);
         $.ajax({
 			url: nextProps.ID + "/get_strategy_data/?format=json",
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
 				this.setState({
-				    log_returns: data.log_returns,
+				    log_returns: data.log_returns.date,
 				    netReturn: data.netReturn,
 				    annualizedReturn: data.annualizedReturn,
 				    maxDrawdown: data.maxDrawdown
@@ -167,7 +167,7 @@ var LoginForm = React.createClass({
 		return (
 			<form className="loginForm" onSubmit={this.handleLoginSubmit}>
 				<h1>Log in</h1>
-				<input type="text" placeholder="Username" ref="loginusername" />
+				<input type="text" placeholder="Username" ref="loginusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
 				<input type="submit" value="Log in" />
 				<br/>
 				<br/>
@@ -186,19 +186,7 @@ var SignupForm = React.createClass({
 		var income = React.findDOMNode(this.refs.income).value.trim();
 		var riskAppetite = React.findDOMNode(this.refs.riskAppetite).value.trim();
 		var savings = React.findDOMNode(this.refs.savings).value.trim();
-		if (!username) {
-			return;
-		}
-		if (!age ) {
-			return;
-		}
-		if (!income ) {
-			return;
-		}
-		if (!riskAppetite ) {
-			return;
-		}
-		if (!savings ) {
+		if (!username || !age || !income || !riskAppetite || !savings) {
 			return;
 		}
 
@@ -223,11 +211,11 @@ var SignupForm = React.createClass({
 		return (
 			<form className="signupForm" onSubmit={this.handleSignupSubmit}>
 				<br><h1>Sign up</h1></br>
-				Username: <input type="text" ref="signupusername" />
-				<br>Age: <input type="number"  min="18" max="150" ref="age" /></br>
-				<br>Income: <input type="number" step="0.50" min="0" max="10000" ref="income" /></br>
-				<br>Risk Appetite(in %): <input type="number"  min="0" max ="100" step ="0.50" ref="riskAppetite" /></br>
-				<br>Savings(in %): <input type="number"  min="0" max ="100" step="0.50"ref="savings" /></br>
+				Username(alpha-numeric): <input type="text" ref="signupusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
+				<br>Age: <input type="number"  min="18" max="150" ref="age" required = "required" /></br>
+				<br>Annual Income(in LPA): <input type="number" step="0.50" min="0" max="10000" ref="income" required = "required"/></br>
+				<br>Risk Appetite(in %): <input type="number"  min="0" max ="100" step ="0.50" ref="riskAppetite" required = "required"/></br>
+				<br>Savings(in %): <input type="number"  min="0" max ="100" step="0.50"ref="savings" required = "required"/></br>
 				<br><input type="submit" value="Sign up" /></br>
 			</form>
 		);
