@@ -1,22 +1,27 @@
-    
-var AppBody = React.createClass({
+var StrategyOption = React.createClass({
 	
 	getInitialState: function() {
         return {
-            firstID: '',
-            secondID: ''
+        	log_returns: '',
+            netReturn: '',
+            annualizedReturn: '',
+            maxDrawdown: ''
         };
     },
     
-    componentDidMount: function() {
+    componentWillReceiveProps: function(nextProps) {
+    	//console.log(nextProps.ID);
+    	//alert(nextProps.ID);
         $.ajax({
-			url: this.props.username + "/get_user_strategies/?format=json",
+			url: nextProps.ID + "/get_strategy_data/?format=json",
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
 				this.setState({
-				    firstID: data.firstID,
-				    secondID: data.secondID
+				    log_returns: data.log_returns,
+				    netReturn: data.netReturn,
+				    annualizedReturn: data.annualizedReturn,
+				    maxDrawdown: data.maxDrawdown
 				});
 			}.bind(this),
 			error: function(xhr, status, err) {
@@ -24,11 +29,110 @@ var AppBody = React.createClass({
 			}.bind(this)
 		});
     },
+    
+	render: function() {
+		datalist = [];
+		for(i = 0; i<this.state.log_returns.length;i++)
+		{
+			datalist.push(
+		   			<div>
+                        <div>
+                            {i+1}
+                        </div>
+                        <div>
+                           	{this.state.log_returns[i].date}
+                        </div>
+                        <div>
+                            {this.state.log_returns[i].value}
+                        </div>
+                    </div>);
+		}
+		return (
+			<div>
+				{this.props.ID}
+				<br/>
+				{datalist}
+				<br/>
+				{this.state.netReturn}
+				<br/>
+				{this.state.annualizedReturn}
+				<br/>
+				{this.state.maxDrawdown}
+			</div>
+		);
+	}
+});
+    
+var AppBody = React.createClass({
+	
+	getInitialState: function() {
+        new_state = {
+            firstID: '',
+            secondID: ''
+        };
+        this.loadInitialState();
+        return new_state;
+    },
+    
+    loadInitialState: function() {
+        $.ajax({
+			url: this.props.username + "/get_user_strategies/?format=json",
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				var state = this.state;
+				state.firstID = data.firstID;
+				state.secondID = data.secondID;
+		    	this.setState(state);
+				/*this.setState({
+				    firstID: data.firstID,
+				    secondID: data.secondID
+				});*/
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(err.toString());
+			}.bind(this)
+		});
+    },
+	
+	handleRadioSubmit: function(e) {
+		e.preventDefault();
+		var firstRadioButton = React.findDOMNode(this.refs.firstRadioButton);
+		var secondRadioButton = React.findDOMNode(this.refs.secondRadioButton);
+		var clickedID = '';
+		if (firstRadioButton.checked) {
+			clickedID = firstRadioButton.value;
+		}
+		else if (secondRadioButton.checked) {
+			clickedID = secondRadioButton.value;
+		}
+		else {
+			alert("Please pick a strategy before submit !");
+			return;
+		}
+		
+		$.ajax({
+			url: this.props.username + "/" + clickedID + "/get_next_strategies/?format=json",
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				this.setState({
+					firstID: data.firstID,
+					secondID: data.secondID
+				});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(err.toString());
+			}.bind(this)
+		});
+				
+		return;
+	},
 	
 	render: function() {
 		return (
-			//<h1>App Body : {this.props.username}</h1>
 			<div>
+				<h1>Hi, {this.props.username}</h1>
 				<div>
 					<StrategyOption ID = {this.state.firstID} />
 				</div>
@@ -79,7 +183,7 @@ var LoginForm = React.createClass({
 		return (
 			<form className="loginForm" onSubmit={this.handleLoginSubmit}>
 				<h1>Log in</h1>
-				<input type="text" placeholder="Username" ref="loginusername" />
+				<input type="text" placeholder="Username" ref="loginusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
 				<input type="submit" value="Log in" />
 				<br/>
 				<br/>
@@ -98,19 +202,7 @@ var SignupForm = React.createClass({
 		var income = React.findDOMNode(this.refs.income).value.trim();
 		var riskAppetite = React.findDOMNode(this.refs.riskAppetite).value.trim();
 		var savings = React.findDOMNode(this.refs.savings).value.trim();
-		if (!username) {
-			return;
-		}
-		if (!age ) {
-			return;
-		}
-		if (!income ) {
-			return;
-		}
-		if (!riskAppetite ) {
-			return;
-		}
-		if (!savings ) {
+		if (!username || !age || !income || !riskAppetite || !savings) {
 			return;
 		}
 
@@ -135,11 +227,11 @@ var SignupForm = React.createClass({
 		return (
 			<form className="signupForm" onSubmit={this.handleSignupSubmit}>
 				<br><h1>Sign up</h1></br>
-				Username: <input type="text" ref="signupusername" />
-				<br>Age: <input type="number"  min="18" max="150" ref="age" /></br>
-				<br>Income: <input type="number" step="0.50" min="0" max="10000" ref="income" /></br>
-				<br>Risk Appetite(in %): <input type="number"  min="0" max ="100" step ="0.50" ref="riskAppetite" /></br>
-				<br>Savings(in %): <input type="number"  min="0" max ="100" step="0.50"ref="savings" /></br>
+				Username(alpha-numeric): <input type="text" ref="signupusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
+				<br>Age: <input type="number"  min="18" max="150" ref="age" required = "required" /></br>
+				<br>Annual Income(in LPA): <input type="number" step="0.50" min="0" max="10000" ref="income" required = "required"/></br>
+				<br>Risk Appetite(in %): <input type="number"  min="0" max ="100" step ="0.50" ref="riskAppetite" required = "required"/></br>
+				<br>Savings(in %): <input type="number"  min="0" max ="100" step="0.50"ref="savings" required = "required"/></br>
 				<br><input type="submit" value="Sign up" /></br>
 			</form>
 		);
@@ -176,6 +268,7 @@ var LoginSignup = React.createClass({
 					<LoginForm onUserLogin = {this.handleUserLogin}/>
 					<h1>OR</h1>
 					<SignupForm onUserLogin = {this.handleUserLogin}/>
+					<script type="text/javascript">alert(1);</script>
 				</div>
 			);
 		}
