@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum,Avg
+import math
 import ast
 import json
 
@@ -9,13 +11,26 @@ class Strategy(models.Model):
         return self.strategyName
         
     def getNetReturn(self):
-    	return 78  
+    	s = Data.objects.filter(strategyID=self.id).aggregate(Sum('logReturn'))
+    	nr = float(((math.exp(s['logReturn__sum']))-1)*100)
+    	return nr  
 	
-	def getAnnualizedReturn(self):
-		return 89 
+    def getAnnualizedReturn(self):
+    	a = Data.objects.filter(strategyID=self.id).aggregate(Avg('logReturn'))
+    	ar = float(((math.exp(252*a['logReturn__avg']))-1)*100)
+    	return ar
 		
-	def getMaxDrawdown(self):
-		return 11     	
+    def getMaxDrawdown(self):
+    	data = Data.objects.filter(strategyID=self.id)
+    	prev = 1
+    	maxOnleft = 0
+    	maxDiff = 0
+    	for d in data:
+            this = prev*math.exp(d.logReturn)
+            maxOnleft = max(maxOnleft,prev)
+            maxDiff = max(maxDiff, maxOnleft-this)
+            prev = this
+    	return 11     	
     	  
 
 class Data(models.Model):

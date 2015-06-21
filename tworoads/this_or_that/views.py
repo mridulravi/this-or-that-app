@@ -15,7 +15,7 @@ def get_strategy_data(request, strategyname):
 	TODO: return all log_returns, netReturn, annualizedReturn, Maxdrawdown for strategyname from data table 
 	'''
 	log_returns = []
-#	serialized_data = serializers.serialize('json', Data.objects.filter(strategyID__strategyName=strategyname))
+	#serialized_data = serializers.serialize('json', Data.objects.filter(strategyID__strategyName=strategyname))
 	data = Data.objects.filter(strategyID__strategyName=strategyname)
 	for d in data:
 		log_returns.append({

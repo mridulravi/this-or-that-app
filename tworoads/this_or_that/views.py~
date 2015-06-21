@@ -6,7 +6,6 @@ from rest_framework.decorators import api_view, link, action
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from this_or_that.models import Strategy, Data, User, Selects
 import json
-import math
 
 @api_view(['GET', 'POST', ])
 def get_strategy_data(request, strategyname):
@@ -18,13 +17,11 @@ def get_strategy_data(request, strategyname):
 	log_returns = []
 #	serialized_data = serializers.serialize('json', Data.objects.filter(strategyID__strategyName=strategyname))
 	data = Data.objects.filter(strategyID__strategyName=strategyname)
-	prev = 1
 	for d in data:
 		log_returns.append({
             "date": d.date,
-            "value": prev*(math.exp(d.logReturn))
+            "value": d.logReturn
         })
-        prev = d.logReturn
 	strategy = get_object_or_404(Strategy, strategyName=strategyname)
 	netReturn = strategy.getNetReturn()
 	annualizedReturn = strategy.getAnnualizedReturn()
