@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, link, action
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from this_or_that.models import Strategy, Data, User, Selects
 import json
+import math
 
 @api_view(['GET', 'POST', ])
 def get_strategy_data(request, strategyname):
@@ -15,7 +16,7 @@ def get_strategy_data(request, strategyname):
 	TODO: return all log_returns, netReturn, annualizedReturn, Maxdrawdown for strategyname from data table 
 	'''
 	log_returns = []
-#	serialized_data = serializers.serialize('json', Data.objects.filter(strategyID__strategyName=strategyname))
+	#serialized_data = serializers.serialize('json', Data.objects.filter(strategyID__strategyName=strategyname))
 	data = Data.objects.filter(strategyID__strategyName=strategyname)
 	for d in data:
 		log_returns.append({
@@ -101,10 +102,10 @@ def check_login(request, username):
 @api_view(['GET', 'POST', ])
 def check_signup(request, username):
 	print 2222
-	age = request.DATA['age'];
-	income = request.DATA['income'];
-	riskAppetite = request.DATA['riskAppetite'];
-	savings = request.DATA['savings'];
+	age = float(request.DATA['age']);
+	income = float(request.DATA['income']);
+	riskAppetite = float(request.DATA['riskAppetite']);
+	savings = float(request.DATA['savings']);
 	print username
 	print age
 	print income
@@ -116,16 +117,70 @@ def check_signup(request, username):
 	if(User.objects.filter(username=username).count() != 0):
 		return Response({'loginStatus': False, 'username': ''})
 	else:
-		all_strategies = list(Strategy.objects.values_list('strategyName',flat=True).all())
-		print all_strategies
-		u = User(username=username, 
-				age=age, 
-				income=income, 
-				riskAppetite=riskAppetite, 
-				savings=savings, 
-				stratChoiceList=all_strategies)
-		u.save()
-		return Response({'loginStatus': True, 'username': username})
+		#all_strategies = list(Strategy.objects.values_list('strategyName',flat=True).all())
+		#print all_strategies
+		all_strategies = Strategy.objects.all()
+		#print "^^^^^^^^^^^^^"
+		#print all_strategies
+		###############
+		preference_order = []
+		for s in all_strategies:
+			users_selected = Selects.objects.filter(sID = s)
+			N = users_selected.count()
+			if(N == 0):
+				preference_order.append((s.strategyName, float("inf")))
+				continue
+			abs_age_diff = 0
+			abs_income_diff = 0
+			abs_riskAppetite_diff = 0
+			abs_savings_diff = 0
+			
+			for u in users_selected:
+				#print "::::"
+				#print u
+				abs_age_diff += abs(age - float(u.uID.age))
+				abs_income_diff += abs(income - float(u.uID.income))
+				abs_riskAppetite_diff += abs(riskAppetite - float(u.uID.riskAppetite))
+				abs_savings_diff += abs(savings - float(u.uID.savings))
+				
+			avg_age_diff = abs_age_diff/N
+			avg_income_diff = abs_income_diff/N
+			avg_riskAppetite_diff = abs_riskAppetite_diff/N
+			avg_savings_diff = abs_savings_diff/N
+			
+			w1 = w2 = w3 = w4 = 0.25
+			w = w1*avg_age_diff + w2*avg_income_diff +  w3*avg_riskAppetite_diff +	w4*avg_savings_diff
+			preference_order.append((s.strategyName, w))
+		
+		#print "%%%%%%%%%%"
+		#print preference_order	
+		preference_order.sort(key=lambda tup: tup[1])
+		#print "$$$$$$$$$$"
+		#print preference_order
+		###############
+		push_order = []
+		i=0
+		j=len(preference_order)-1
+		while(i<j):
+			push_order.append(preference_order[i][0])
+			push_order.append(preference_order[j][0])
+			i += 1
+			j -= 1
+		if(i==j):
+			push_order.append(preference_order[i][0])
+		
+		#print "#######"
+		#print push_order
+		return Response({'loginStatus': False, 'username': ''}) #TEMPORARY
+		###############
+#		u = User(username=username, 
+#				age=age, 
+#				income=income, 
+#				riskAppetite=riskAppetite, 
+#				savings=savings, 
+#				stratChoiceList=push_order)
+#		u.save()
+#		return Response({'loginStatus': True, 'username': username})
     
         
 def index(request):

@@ -267,6 +267,9 @@ var AppBody = React.createClass({
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
+				if(data.firstID == data.secondID) {
+					alert("Based on your choices the best strategy for you is\nStrategy number " + data.secondID );
+				}
 				var state = this.state;
 				state.firstID = data.firstID;
 				state.secondID = data.secondID;
@@ -356,6 +359,9 @@ var LoginForm = React.createClass({
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
+				if(data.loginStatus==false) {
+					alert("The username you entered is NOT registered. \n\nPlease try again or Sign up");
+				}
 				this.props.onUserLogin(data.loginStatus, data.username);
 			}.bind(this),
 			error: function(xhr, status, err) {
@@ -400,6 +406,9 @@ var SignupForm = React.createClass({
 			data: {'age': age, 'income': income, 'riskAppetite': riskAppetite, 'savings': savings},
 			cache: false,
 			success: function(data) {
+				if(data.loginStatus==false) {
+					alert("The username you entered is NOT available. \n\nPlease sign up with a different username");
+				}
 				this.props.onUserLogin(data.loginStatus, data.username);
 			}.bind(this),
 			error: function(xhr, status, err) {
