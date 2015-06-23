@@ -170,6 +170,70 @@ var LineChart = React.createClass({
 
 
 
+var HighchartsBar = React.createClass({displayName: 'HighchartsBar',
+  renderChart: function() {
+        var node = this.refs.chartNode.getDOMNode();
+        var dataSeries = this.props.model;
+        var daterange = this.props.daterange;
+        jQuery(function ($) {
+        $(node).highcharts({
+        chart: {
+            zoomType: 'x'
+        },
+        title: {
+            text: 'Daily Log Returns',
+            x: -20 //center
+        },
+        subtitle: {
+ 			text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' :
+                    'Pinch the chart to zoom in',
+            x: -20
+        },
+        xAxis: daterange,
+        yAxis: {
+            title: {
+                text: 'Daily log returns'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {},
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: dataSeries
+        });
+    });
+ 
+  },
+  componentWillReceiveProps: function(nextProps) {
+    // we can use this method to see if the component is receiving props
+  },
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return nextProps.model.length > 0; // should we update the component?
+  },
+  componentDidMount: function() {
+    this.renderChart();// this method will be invoked when the component is mounted
+  },
+  componentDidUpdate: function() {
+    this.renderChart(); // after the component props are updated, render the chart into the DOM node
+  },
+  render: function() {
+    return (
+      React.DOM.div({className: "chart", ref: "chartNode"})
+    );
+  }
+});
+
+
+
 
 
 
@@ -207,6 +271,7 @@ var StrategyOption = React.createClass({
     
 	render: function() {
 		datalist = [];
+		categoriesList = [];
 		for(i = 0; i<this.state.log_returns.length;i++)
 		{
 //			datalist.push(
@@ -223,17 +288,28 @@ var StrategyOption = React.createClass({
 //                            {parseFloat(this.state.log_returns[i].value)}
 //                        </div>
 //                    </div>);
-			var singleObj = {};
-			singleObj['x'] = new Date(parseInt(this.state.log_returns[i].date.substring(0,4)),
+			categoriesList.push(new Date(parseInt(this.state.log_returns[i].date.substring(0,4)),
 									  parseInt(this.state.log_returns[i].date.substring(5,7))-1,
-									  parseInt(this.state.log_returns[i].date.substring(8)));
-			singleObj['y'] = parseFloat(this.state.log_returns[i].value);
-			datalist.push(singleObj);
+									  parseInt(this.state.log_returns[i].date.substring(8))));
+			datalist.push(parseFloat(this.state.log_returns[i].value));
 //			datalist.push(x: new Date({parseInt(this.state.log_returns[i].date.substring(0,4))},
 //									  {parseInt(this.state.log_returns[i].date.substring(5,7))-1},
 //									  {parseInt(this.state.log_returns[i].date.substring(8))}), 
 //						   y: {parseFloat(this.state.log_returns[i].value)});
 		}
+		model = [];
+		var singleObj = {};
+		singleObj['name'] = this.props.ID;
+		singleObj['data'] = datalist;
+		model.push(singleObj);
+		
+		var daterange = {};
+		daterange['type'] = 'datetime';
+		var labelObj = {};
+		labelObj['format'] = '{value: %a %b %e %Y}';
+		daterange['labels'] = labelObj;
+		daterange['categories'] = categoriesList;
+		
 		thisID = "Strategy: ".concat(this.props.ID)
 		thisNR = "Net Return: ".concat(this.state.netReturn).concat("%")
 		thisAR = "Annualized Return: ".concat(this.state.annualizedReturn).concat("%")
@@ -241,6 +317,7 @@ var StrategyOption = React.createClass({
 		return (
 			<div>
 				<h2>Strategy ID: {this.props.ID}</h2>
+				<HighchartsBar model={model} daterange={daterange}/>
 				<div id="more-info-container">
 					<div id="button">
 						<span>
@@ -258,11 +335,11 @@ var StrategyOption = React.createClass({
 						</ul>
 					</div>
 				</div>
-				<LineChart data={datalist} legend={true} title = "Line Chart"/>
 			</div>
 		);
 	}
 });
+//<LineChart data={datalist} legend={true} title = "Line Chart"/>
     
 var AppBody = React.createClass({
 	
@@ -340,10 +417,18 @@ var AppBody = React.createClass({
 				<div>
 					<StrategyOption ID = {this.state.firstID} />
 				</div>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
 				<hr/>
 				<div>
 					<StrategyOption ID = {this.state.secondID} />
 				</div>
+				<br/>
+				<br/>
+				<br/>
+				<br/>
 				<hr/>
 				<div >
 					<h2> Pick a strategy:</h2>
