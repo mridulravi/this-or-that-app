@@ -234,7 +234,6 @@ var StrategyOption = React.createClass({
 //									  {parseInt(this.state.log_returns[i].date.substring(8))}), 
 //						   y: {parseFloat(this.state.log_returns[i].value)});
 		}
-		console.log(this.state.maxDrawdown);
 		thisID = "Strategy: ".concat(this.props.ID)
 		thisNR = "Net Return: ".concat(this.state.netReturn).concat("%")
 		thisAR = "Annualized Return: ".concat(this.state.annualizedReturn).concat("%")
@@ -242,9 +241,6 @@ var StrategyOption = React.createClass({
 		return (
 			<div>
 				<h2>Strategy ID: {this.props.ID}</h2>
-				<br/>
-				<LineChart data={datalist} legend={true} title = "Line Chart"/>
-				
 				<div id="more-info-container">
 					<div id="button">
 						<span>
@@ -262,7 +258,7 @@ var StrategyOption = React.createClass({
 						</ul>
 					</div>
 				</div>
-				
+				<LineChart data={datalist} legend={true} title = "Line Chart"/>
 			</div>
 		);
 	}
@@ -349,10 +345,11 @@ var AppBody = React.createClass({
 					<StrategyOption ID = {this.state.secondID} />
 				</div>
 				<hr/>
-				<div>
+				<div >
+					<h2> Pick a strategy:</h2>
 					<form onSubmit={this.handleRadioSubmit}>
 						<div className="register-switch" >
-							<input type="radio" className="register-switch-input" name="choice" ref="firstRadioButton" id="firstRadioButton" value={this.state.firstID} checked="checked"/>
+							<input type="radio" className="register-switch-input" name="choice" ref="firstRadioButton" id="firstRadioButton" value={this.state.firstID} />
 							<label htmlFor="firstRadioButton" className="register-switch-label">{this.state.firstID}</label>
 							<input type="radio" className="register-switch-input" name="choice" ref="secondRadioButton" id="secondRadioButton" value={this.state.secondID} />
 							<label htmlFor="secondRadioButton" className="register-switch-label">{this.state.secondID}</label>

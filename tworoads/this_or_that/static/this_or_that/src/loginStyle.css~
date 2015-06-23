@@ -61,10 +61,10 @@ font-family: 'Arial', Verdana, arial;
 
 #more-info-container{
 height: 20px;
-width: 225px;
-padding-top: 50px;
-padding-left: 40px;
-padding-bottom: 50px;
+width: 250px;
+padding-top: 10px;
+padding-left: 34px;
+padding-bottom: 20px;
 }
 
 #more-info-container:hover .first-hover, #more-info-container:hover .button-hover{
@@ -75,9 +75,9 @@ padding-bottom: 50px;
 }
 
 #button{
-/*margin: 0 auto;*/
-/*width: 150px;*/
-/*height: 30px;*/
+margin: 0;
+width: 250px;
+height: 30px;
 /*text-align: center;*/
 /*background-image: -webkit-linear-gradient(#3A57AF, #3A57AF);*/
 /*background-image: -moz-linear-gradient(#3A57AF, #3A57AF);*/
@@ -143,7 +143,7 @@ position: absolute;
 visibility:hidden;
 top:0;
 left: 117px;/* left of Strategy fist opening */
-width: 0;
+width: 250;
 height: 29px;
 margin: 0;
 padding: 0;
@@ -173,7 +173,7 @@ transition: all 0.2s ease-in-out;
 }
 
 #button:hover .first-hover{
-width: 200px;
+width: 250px;
 visibility:visible;
 -webkit-transition-delay:0s;
 -moz-transition-delay:0s;
@@ -237,7 +237,7 @@ width: 250px;
   height: 32px;
   margin-left: 15px;
   margin-bottom: 15px;
-  padding: 4px;
+  padding-left: 10px;
   background: #6db244;
   border-radius: 4px;
   background-image: -webkit-linear-gradient(top, #60a83a, #7dbe52);
@@ -425,6 +425,23 @@ input[type=password]{
   border: solid 0px #cbc9c9;
 }
 
+/*#id-icon {*/
+/*  display: inline-block;*/
+/*  height: 22px;*/
+/*  width: 210px;*/
+/*  background-color: #FF9900;*/
+/*  padding: 2px 2px 6px 15px;*/
+/*  margin-left: 0px;*/
+/*  -webkit-border-radius: 0px 4px 4px 0px; */
+/*  -moz-border-radius: 0px 4px 4px 0px; */
+/*  border-radius: 0px 4px 4px 0px;*/
+/*  color: white;*/
+/*  -webkit-box-shadow: 1px 2px 5px rgba(0,0,0,.09);*/
+/*  -moz-box-shadow: 1px 2px 5px rgba(0,0,0,.09); */
+/*  box-shadow: 1px 2px 5px rgba(0,0,0,.09); */
+/*  border: solid 0px #cbc9c9;*/
+/*}*/
+
 .gender {
   margin-left: 30px;
   margin-bottom: 30px;
@@ -518,3 +535,20 @@ a.button:hover {
   -webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255,255,255,0.2)));
 }
 
+#pick-text
+{
+   width:200px; 
+   display: inline-block;
+}
+
+#choice-form
+{
+   width:700px;
+   display: inline-block;
+}
+
+#choice-div
+{
+   width:1000px;
+   display: inline-block;
+}
