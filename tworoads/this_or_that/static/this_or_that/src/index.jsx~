@@ -125,8 +125,8 @@ var DataSeries = React.createClass({
 var LineChart = React.createClass({
   getDefaultProps: function() {
     return {
-      width: 6000,
-      height: 200
+      width: 60000,
+      height: 300
     }
   },
 
@@ -234,35 +234,17 @@ var StrategyOption = React.createClass({
 //									  {parseInt(this.state.log_returns[i].date.substring(8))}), 
 //						   y: {parseFloat(this.state.log_returns[i].value)});
 		}
-		console.log(this.state.maxDrawdown);
-		thisID = "Strategy: ".concat(this.props.ID)
-		thisNR = "Net Return: ".concat(this.state.netReturn).concat("%")
-		thisAR = "Annualized Return: ".concat(this.state.annualizedReturn).concat("%")
-		thisMD = "Maximum Drawdown: ".concat(this.state.maxDrawdown).concat("%")
 		return (
 			<div>
-				<h2>Strategy ID: {this.props.ID}</h2>
+				{this.props.ID}
 				<br/>
 				<LineChart data={datalist} legend={true} title = "Line Chart"/>
-				
-				<div id="more-info-container">
-					<div id="button">
-						<span>
-							<label id="more-info-icon" htmlFor="name">
-								<i className="fa fa-plus-circle">  More Info</i>
-							</label>
-						</span>
-						<a className="first-hover">
-							{thisID}
-						</a>
-						<ul className="menu">
-							<li><a>{thisNR}</a></li>
-							<li><a>{thisAR}</a></li>
-							<li><a>{thisMD}</a></li>
-						</ul>
-					</div>
-				</div>
-				
+				<br/>
+				{this.state.netReturn}
+				<br/>
+				{this.state.annualizedReturn}
+				<br/>
+				{this.state.maxDrawdown}
 			</div>
 		);
 	}
@@ -344,20 +326,16 @@ var AppBody = React.createClass({
 				<div>
 					<StrategyOption ID = {this.state.firstID} />
 				</div>
-				<hr/>
 				<div>
 					<StrategyOption ID = {this.state.secondID} />
 				</div>
-				<hr/>
 				<div>
-					<form onSubmit={this.handleRadioSubmit}>
-						<div className="register-switch" >
-							<input type="radio" className="register-switch-input" name="choice" ref="firstRadioButton" id="firstRadioButton" value={this.state.firstID} checked="checked"/>
-							<label htmlFor="firstRadioButton" className="register-switch-label">{this.state.firstID}</label>
-							<input type="radio" className="register-switch-input" name="choice" ref="secondRadioButton" id="secondRadioButton" value={this.state.secondID} />
-							<label htmlFor="secondRadioButton" className="register-switch-label">{this.state.secondID}</label>
-						</div>
-						<input className="register-button" type="submit" value="Submit!" />
+					<form className="selectForm" onSubmit={this.handleRadioSubmit}>
+						<input type="radio" name="choice" ref="firstRadioButton" value={this.state.firstID} />
+						{this.state.firstID}
+						<input type="submit" value="Submit stratgy choice" />
+						<input type="radio" name="choice" ref="secondRadioButton" value={this.state.secondID} />
+						{this.state.secondID}
 					</form>
 				</div>
 			</div>
@@ -398,12 +376,10 @@ var LoginForm = React.createClass({
 		return (
 			<form className="loginForm" onSubmit={this.handleLoginSubmit}>
 				<h1>Log in</h1>
-				<hr/>
-				<label id="icon" htmlFor="name"><i className="icon-user"></i></label>
 				<input type="text" placeholder="Username" ref="loginusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
+				<input type="submit" value="Log in" />
 				<br/>
 				<br/>
-				<input type="submit" value="Log in" className = "submit"/>
 			</form>
 		);
 	}
@@ -446,25 +422,13 @@ var SignupForm = React.createClass({
 	render: function() {
 		return (
 			<form className="signupForm" onSubmit={this.handleSignupSubmit}>
-				<h1>Sign up</h1>
-				<hr/>
-				<label id="icon"htmlFor="name"><i className="icon-user"></i></label>
-				<input type="text" placeholder="Username" ref="signupusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
-				<br/>
-				<label id="icon"htmlFor="name"><i className="fa fa-calendar"></i></label>
-				<input type="number" placeholder="Age" min="18" max="150" ref="age" required = "required" />
-				<br/>
-				<label id="icon"htmlFor="name"><i className="fa fa-inr"></i></label>
-				<input type="number" placeholder="Annual Income(in LPA)" step="0.50" min="0" max="10000" ref="income" required = "required"/>
-				<br/>
-				<label id="icon"htmlFor="name"><i className="icon-flag"></i></label>
-				<input type="number"  placeholder="Risk Appetite(in %)" min="0" max ="100" step ="0.50" ref="riskAppetite" required = "required"/>
-				<br/>
-				<label id="icon"htmlFor="name"><i className="fa fa-money"></i></label>
-				<input type="number"  placeholder="Savings(in %)"min="0" max ="100" step="0.50"ref="savings" required = "required"/>
-				<br/>
-				<br/>
-				<input type="submit" value="Sign up" className = "submit"/>
+				<br><h1>Sign up</h1></br>
+				Username(alpha-numeric): <input type="text" ref="signupusername" required = "required" required pattern="[a-zA-Z0-9]+"/>
+				<br>Age: <input type="number"  min="18" max="150" ref="age" required = "required" /></br>
+				<br>Annual Income(in LPA): <input type="number" step="0.50" min="0" max="10000" ref="income" required = "required"/></br>
+				<br>Risk Appetite(in %): <input type="number"  min="0" max ="100" step ="0.50" ref="riskAppetite" required = "required"/></br>
+				<br>Savings(in %): <input type="number"  min="0" max ="100" step="0.50"ref="savings" required = "required"/></br>
+				<br><input type="submit" value="Sign up" /></br>
 			</form>
 		);
 	}
@@ -496,10 +460,10 @@ var LoginSignup = React.createClass({
 		else
 		{
 			return (
-				<div className="testbox">
-					<SignupForm onUserLogin = {this.handleUserLogin}/>
-					<br/>
+				<div class="testbox" className="testbox">
 					<LoginForm onUserLogin = {this.handleUserLogin}/>
+					<h1>OR</h1>
+					<SignupForm onUserLogin = {this.handleUserLogin}/>
 					<script type="text/javascript">alert(1);</script>
 				</div>
 			);

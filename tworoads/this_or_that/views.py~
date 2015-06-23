@@ -171,16 +171,16 @@ def check_signup(request, username):
 		
 		#print "#######"
 		#print push_order
-		return Response({'loginStatus': False, 'username': ''}) #TEMPORARY
+		#return Response({'loginStatus': False, 'username': ''}) #TEMPORARY
 		###############
-#		u = User(username=username, 
-#				age=age, 
-#				income=income, 
-#				riskAppetite=riskAppetite, 
-#				savings=savings, 
-#				stratChoiceList=push_order)
-#		u.save()
-#		return Response({'loginStatus': True, 'username': username})
+		u = User(username=username, 
+				age=age, 
+				income=income, 
+				riskAppetite=riskAppetite, 
+				savings=savings, 
+				stratChoiceList=push_order)
+		u.save()
+		return Response({'loginStatus': True, 'username': username})
     
         
 def index(request):
