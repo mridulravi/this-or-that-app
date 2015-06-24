@@ -134,13 +134,13 @@ var StrategyOption = React.createClass({
 								<i className="fa fa-plus-circle">  More Info</i>
 							</label>
 						</span>
-						<a className="first-hover">
+						<a className="netReturn">
 							{thisNR}
 						</a>
-						<a className="sec-hover">
+						<a className="annualizedReturn">
 							{thisAR}
 						</a>
-						<a className="third-hover">
+						<a className="maxDrawdown">
 							{thisMD}
 						</a>
 					</div>
@@ -170,9 +170,6 @@ var AppBody = React.createClass({
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
-				if(data.firstID == data.secondID) {
-					alert("Based on your choices the best strategy for you is\nStrategy number " + data.secondID );
-				}
 				var state = this.state;
 				state.firstID = data.firstID;
 				state.secondID = data.secondID;
@@ -205,6 +202,9 @@ var AppBody = React.createClass({
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
+				if(data.firstID == data.secondID) {
+					alert("Based on your choices the best strategy for you is Strategy: " + data.secondID );
+				}
 				this.setState({
 					firstID: data.firstID,
 					secondID: data.secondID
@@ -240,6 +240,7 @@ var AppBody = React.createClass({
 						</div>
 						<input className="register-button" type="submit" value="Submit!" />
 					</form>
+					<br/>
 				</div>
 			</div>
 		);
@@ -377,8 +378,9 @@ var LoginSignup = React.createClass({
 	render: function() {
 		if(this.state.loginStatus == true)
 		{
+			var displayUsername = '';
 			if((this.state.username).length > 10){
-				var displayUsername = (this.state.username).substr(0,10)+'...';
+				displayUsername = (this.state.username).substr(0,10)+'...';
 			}
 			else {
 				displayUsername = this.state.username;

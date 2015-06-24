@@ -6,7 +6,12 @@ from this_or_that.models import Strategy, Data, User, Selects
 @api_view(['GET', 'POST', ])
 def get_strategy_data(request, strategyname):
 	'''
-	TODO: return all log_returns, netReturn, annualizedReturn, Maxdrawdown for strategyname from data table 
+	Takes as parameter a strategyName=strategyname and returns:
+		all log_returns, 
+		netReturn, 
+		annualizedReturn, 
+		Maxdrawdown 
+		for strategyname from data table 
 	'''
 	log_returns = []
 	data = Data.objects.filter(strategyID__strategyName=strategyname)
@@ -24,9 +29,15 @@ def get_strategy_data(request, strategyname):
 @api_view(['GET', 'POST', ])
 def get_next_strategies(request, username, selected):
 	'''
-	TODO: Push into selects (username, selected), 
-	push into stratchoicelist the selected strategy
-	return next two stratgies from stratChoiceList 
+	Takes as parameters: 
+		username of the user
+		strategyName=selected 
+	Returns:
+		next two stratgies from stratChoiceList of user=username
+	Also: 
+		Push into selects (username, selected), 
+		Pop the first two strategies from stratChoiceList of the user
+		Push the selected strategy at the end of stratchoicelist of the user
 	'''
 	user = get_object_or_404(User, username=username)
 	strategy = get_object_or_404(Strategy, strategyName=selected)
@@ -64,7 +75,9 @@ def get_next_strategies(request, username, selected):
 @api_view(['GET', 'POST', ])
 def get_user_strategies(request, username):
 	'''
-	TODO: return first two stratgies from stratChoiceList 
+	Takes as parameter the username of the just logged in user
+	and returns first two stratgies from stratChoiceList of this user
+	(does not POP/REMOVE, only returns) 
 	'''
 	user = get_object_or_404(User, username=username)
 	stratChoiceList = user.stratChoiceList
@@ -77,7 +90,10 @@ def get_user_strategies(request, username):
 @api_view(['GET', 'POST', ])
 def check_login(request, username):
 	'''
-	TODO: Login check if true send true, username else send false, blank
+	Login check is successful 
+		Return (true, username)
+	else 
+		Return (false, blank)
 	'''
 	if(User.objects.filter(username=username).count() == 0):
 		return Response({'loginStatus': False, 'username': ''})
@@ -86,18 +102,22 @@ def check_login(request, username):
 
 @api_view(['GET', 'POST', ])
 def check_signup(request, username):
+	'''
+	If Signup check is successful 
+		Return (true, username)
+	else 
+		Return (false, blank)
+	'''
 	age = float(request.DATA['age']);
 	income = float(request.DATA['income']);
 	riskAppetite = float(request.DATA['riskAppetite']);
 	savings = float(request.DATA['savings']);
-	'''
-	TODO: Signup check if true send true, username else send false, blank
-	'''
+	
 	if(User.objects.filter(username=username).count() != 0):
 		return Response({'loginStatus': False, 'username': ''})
 	else:
 		all_strategies = Strategy.objects.all()
-		###############
+		####### Construction of preference order of strategies for this user ######
 		preference_order = []
 		for s in all_strategies:
 			users_selected = Selects.objects.filter(sID = s)
@@ -126,7 +146,7 @@ def check_signup(request, username):
 			preference_order.append((s.strategyName, w))
 		
 		preference_order.sort(key=lambda tup: tup[1])
-		###############
+		####### Construction of stratChoiceList of the user based on preference order ######
 		push_order = []
 		i=0
 		j=len(preference_order)-1
@@ -137,7 +157,7 @@ def check_signup(request, username):
 			j -= 1
 		if(i==j):
 			push_order.append(preference_order[i][0])
-		###############
+		############### Database insertion ###############
 		u = User(username=username, 
 				age=age, 
 				income=income, 

@@ -1,175 +1,69 @@
-var Chart = React.createClass({
+
+// React ref: https://facebook.github.io/react/docs/tutorial.html
+
+// This highcharts design taken from http://yaymedia.net/?p=1571 
+var HighchartsBar = React.createClass({displayName: 'HighchartsBar',
+  renderChart: function() {
+        var node = this.refs.chartNode.getDOMNode();
+        var dataSeries = this.props.model;
+        var daterange = this.props.daterange;
+        jQuery(function ($) {
+        $(node).highcharts({
+        chart: {
+            zoomType: 'x'
+        },
+        title: {
+            text: 'Daily Log Returns',
+            x: -20 //center
+        },
+        subtitle: {
+ 			text: document.ontouchstart === undefined ?
+                    'Click and drag in the plot area to zoom in' :
+                    'Pinch the chart to zoom in',
+            x: -20
+        },
+        xAxis: daterange,
+        yAxis: {
+            title: {
+                text: 'Daily log returns'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {},
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: dataSeries
+        });
+    });
+ 
+  },
+  componentWillReceiveProps: function(nextProps) {
+    // we can use this method to see if the component is receiving props
+  },
+  shouldComponentUpdate: function(nextProps, nextState) {
+    return nextProps.model.length > 0; // should we update the component?
+  },
+  componentDidMount: function() {
+		//    this.renderChart();
+		// this method will be invoked when the component is mounted
+  },
+  componentDidUpdate: function() {
+    this.renderChart(); // after the component props are updated, render the chart into the DOM node
+  },
   render: function() {
     return (
-      <svg width={this.props.width} height={this.props.height}>{this.props.children}</svg>
+      React.DOM.div({className: "chart", ref: "chartNode"})
     );
   }
 });
-
-
-
-//var Bar = React.createClass({
-//  getDefaultProps: function() {
-//    return {
-//      width: 0,
-//      height: 0,
-//      offset: 0
-//    }
-//  },
-
-//  render: function() {
-//    return (
-//      <rect fill={this.props.color}
-//        width={this.props.width} height={this.props.height} 
-//        x={this.props.offset} y={this.props.availableHeight - this.props.height} />
-//    );
-//  }
-//});
-
-
-
-//var DataSeries = React.createClass({
-//  getDefaultProps: function() {
-//    return {
-//      title: '',
-//      data: []
-//    }
-//  },
-
-//  render: function() {
-//    var props = this.props;
-
-//    var yScale = d3.scale.linear()
-//      .domain([0, d3.max(this.props.data)])
-//      .range([0, this.props.height]);
-
-//    var xScale = d3.scale.ordinal()
-//      .domain(d3.range(this.props.data.length))
-//      .rangeRoundBands([0, this.props.width], 0.05);
-
-//    var bars = _.map(this.props.data, function(point, i) {
-//      return (
-//        <Bar height={yScale(point)} width={xScale.rangeBand()} offset={xScale(i)} availableHeight={props.height} color={props.color} key={i} />
-//      )
-//    });
-
-//    return (
-//      <g>{bars}</g>
-//    );
-//  }
-//});
-
-
-
-
-
-//var BarChart = React.createClass({
-//  render: function() {
-//    return (
-//      <Chart width={this.props.width} height={this.props.height}>
-//        <DataSeries data={[ 30, 10, 5, 8, 15, 10 ]} width={this.props.width} height={this.props.height} color="cornflowerblue" />
-//      </Chart>
-//    );
-//  }
-//});
-
-//React.render(
-//  <BarChart width={600} height={300} />,
-//  document.getElementById('content')
-//);
-
-var Line = React.createClass({
-  getDefaultProps: function() {
-    return {
-      path: '',
-      color: 'blue',
-      width: 2
-    }
-  },
-
-  render: function() {
-    return (
-      <path d={this.props.path} stroke={this.props.color} strokeWidth={this.props.width} fill="none" />
-    );
-  }
-});
-
-
-var DataSeries = React.createClass({
-  getDefaultProps: function() {
-    return {
-      data: [],
-      interpolate: 'linear'
-    }
-  },
-
-  render: function() {
-    var self = this,
-        props = this.props,
-        yScale = props.yScale,
-        xScale = props.xScale;
-    
-    var path = d3.svg.line()
-        .x(function(d) { return xScale(d.x); })
-        .y(function(d) { return yScale(d.y); })
-        .interpolate(this.props.interpolate);
-
-    return (
-      <Line path={path(this.props.data)} color={this.props.color} />
-    )
-  }
-});
-
-
-
-var LineChart = React.createClass({
-  getDefaultProps: function() {
-    return {
-      width: 6000,
-      height: 200
-    }
-  },
-
-  render: function() {
-    var data = this.props.data,
-        size = { width: this.props.width, height: this.props.height };
-
-    var max = _.chain(data)
-      .zip()
-      .map(function(values) {
-        return _.reduce(values, function(memo, value) { return Math.max(memo, value.y); }, 0);
-      })
-      .max()
-      .value();
-     
-    var min = _.chain(data)
-      .zip()
-      .map(function(values) {
-        return _.reduce(values, function(memo, value) { return Math.min(memo, value.y); }, 0);
-      })
-      .min()
-      .value();
-
-    var xScale = d3.scale.linear()
-      .domain([new Date(1995,0,1), new Date(2014,11,31)])
-      .range([0, this.props.width]);
-
-    var yScale = d3.scale.linear()
-      .domain([min, max])
-      .range([this.props.height, 0]);
-
-    return (
-      <Chart width={this.props.width} height={this.props.height}>
-        <DataSeries data={data} size={size} xScale={xScale} yScale={yScale} ref="series1" color="cornflowerblue" />
-      </Chart>
-    );
-  }
-});
-
-
-
-
-
 
 
 
@@ -185,8 +79,6 @@ var StrategyOption = React.createClass({
     },
     
     componentWillReceiveProps: function(nextProps) {
-    	//console.log(nextProps.ID);
-    	//alert(nextProps.ID);
         $.ajax({
 			url: nextProps.ID + "/get_strategy_data/?format=json",
 			dataType: 'json',
@@ -207,44 +99,34 @@ var StrategyOption = React.createClass({
     
 	render: function() {
 		datalist = [];
+		categoriesList = [];
 		for(i = 0; i<this.state.log_returns.length;i++)
 		{
-//			datalist.push(
-//		   			<div>
-//                        <div>
-//                            {i+1}
-//                        </div>
-//                        <div>
-//                           	{this.state.log_returns[i].date.substring(0,4)}
-//                           	{parseInt(this.state.log_returns[i].date.substring(5,7))-1}
-//                           	{this.state.log_returns[i].date.substring(8)}
-//                        </div>
-//                        <div>
-//                            {parseFloat(this.state.log_returns[i].value)}
-//                        </div>
-//                    </div>);
-			var singleObj = {};
-			singleObj['x'] = new Date(parseInt(this.state.log_returns[i].date.substring(0,4)),
+			categoriesList.push(new Date(parseInt(this.state.log_returns[i].date.substring(0,4)),
 									  parseInt(this.state.log_returns[i].date.substring(5,7))-1,
-									  parseInt(this.state.log_returns[i].date.substring(8)));
-			singleObj['y'] = parseFloat(this.state.log_returns[i].value);
-			datalist.push(singleObj);
-//			datalist.push(x: new Date({parseInt(this.state.log_returns[i].date.substring(0,4))},
-//									  {parseInt(this.state.log_returns[i].date.substring(5,7))-1},
-//									  {parseInt(this.state.log_returns[i].date.substring(8))}), 
-//						   y: {parseFloat(this.state.log_returns[i].value)});
+									  parseInt(this.state.log_returns[i].date.substring(8))));
+			datalist.push(parseFloat(this.state.log_returns[i].value));
 		}
-		console.log(this.state.maxDrawdown);
-		thisID = "Strategy: ".concat(this.props.ID)
+		model = [];
+		var singleObj = {};
+		singleObj['name'] = this.props.ID;
+		singleObj['data'] = datalist;
+		model.push(singleObj);
+		
+		var daterange = {};
+		daterange['type'] = 'datetime';
+		var labelObj = {};
+		labelObj['format'] = '{value: %a %b %e %Y}';
+		daterange['labels'] = labelObj;
+		daterange['categories'] = categoriesList;
+		
 		thisNR = "Net Return: ".concat(this.state.netReturn).concat("%")
 		thisAR = "Annualized Return: ".concat(this.state.annualizedReturn).concat("%")
 		thisMD = "Maximum Drawdown: ".concat(this.state.maxDrawdown).concat("%")
 		return (
 			<div>
 				<h2>Strategy ID: {this.props.ID}</h2>
-				<br/>
-				<LineChart data={datalist} legend={true} title = "Line Chart"/>
-				
+				<HighchartsBar model={model} daterange={daterange}/>
 				<div id="more-info-container">
 					<div id="button">
 						<span>
@@ -252,21 +134,24 @@ var StrategyOption = React.createClass({
 								<i className="fa fa-plus-circle">  More Info</i>
 							</label>
 						</span>
-						<a className="first-hover">
-							{thisID}
+						<a className="netReturn">
+							{thisNR}
 						</a>
-						<ul className="menu">
-							<li><a>{thisNR}</a></li>
-							<li><a>{thisAR}</a></li>
-							<li><a>{thisMD}</a></li>
-						</ul>
+						<a className="annualizedReturn">
+							{thisAR}
+						</a>
+						<a className="maxDrawdown">
+							{thisMD}
+						</a>
 					</div>
 				</div>
-				
 			</div>
 		);
 	}
 });
+
+
+
     
 var AppBody = React.createClass({
 	
@@ -285,17 +170,10 @@ var AppBody = React.createClass({
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
-				if(data.firstID == data.secondID) {
-					alert("Based on your choices the best strategy for you is\nStrategy number " + data.secondID );
-				}
 				var state = this.state;
 				state.firstID = data.firstID;
 				state.secondID = data.secondID;
 		    	this.setState(state);
-				/*this.setState({
-				    firstID: data.firstID,
-				    secondID: data.secondID
-				});*/
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(err.toString());
@@ -324,6 +202,9 @@ var AppBody = React.createClass({
 			dataType: 'json',
 			cache: false,
 			success: function(data) {
+				if(data.firstID == data.secondID) {
+					alert("Based on your choices the best strategy for you is Strategy: " + data.secondID );
+				}
 				this.setState({
 					firstID: data.firstID,
 					secondID: data.secondID
@@ -340,7 +221,6 @@ var AppBody = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<h1>Hi, {this.props.username}</h1>
 				<div>
 					<StrategyOption ID = {this.state.firstID} />
 				</div>
@@ -349,21 +229,25 @@ var AppBody = React.createClass({
 					<StrategyOption ID = {this.state.secondID} />
 				</div>
 				<hr/>
-				<div>
+				<div >
+					<h3> Pick a strategy:</h3>
 					<form onSubmit={this.handleRadioSubmit}>
 						<div className="register-switch" >
-							<input type="radio" className="register-switch-input" name="choice" ref="firstRadioButton" id="firstRadioButton" value={this.state.firstID} checked="checked"/>
+							<input type="radio" className="register-switch-input" name="choice" ref="firstRadioButton" id="firstRadioButton" value={this.state.firstID} />
 							<label htmlFor="firstRadioButton" className="register-switch-label">{this.state.firstID}</label>
 							<input type="radio" className="register-switch-input" name="choice" ref="secondRadioButton" id="secondRadioButton" value={this.state.secondID} />
 							<label htmlFor="secondRadioButton" className="register-switch-label">{this.state.secondID}</label>
 						</div>
 						<input className="register-button" type="submit" value="Submit!" />
 					</form>
+					<br/>
 				</div>
 			</div>
 		);
 	}
 });
+
+
 
 var LoginForm = React.createClass({
 	
@@ -408,6 +292,8 @@ var LoginForm = React.createClass({
 		);
 	}
 });
+
+
 
 
 var SignupForm = React.createClass({
@@ -470,6 +356,9 @@ var SignupForm = React.createClass({
 	}
 });
 
+
+
+
 var LoginSignup = React.createClass({
 	
 	getInitialState: function() {
@@ -489,18 +378,37 @@ var LoginSignup = React.createClass({
 	render: function() {
 		if(this.state.loginStatus == true)
 		{
+			var displayUsername = '';
+			if((this.state.username).length > 10){
+				displayUsername = (this.state.username).substr(0,10)+'...';
+			}
+			else {
+				displayUsername = this.state.username;
+			}
 			return (
-				<AppBody username = {this.state.username} />
+				<div>
+					<div className="top-bar">
+						<label id="top-bar-icon" htmlFor="name"><i className="fa fa-refresh fa-2x"></i></label>
+						<h1 className="top-bar-text">THIS-OR-THAT</h1>
+						<h2 className="top-bar-user">Logged in: {displayUsername} </h2>
+					</div>
+					<AppBody username = {this.state.username} />
+				</div>
 			);
 		}
 		else
 		{
 			return (
-				<div className="testbox">
-					<SignupForm onUserLogin = {this.handleUserLogin}/>
-					<br/>
-					<LoginForm onUserLogin = {this.handleUserLogin}/>
-					<script type="text/javascript">alert(1);</script>
+				<div>
+					<div className="top-bar">
+						<label id="top-bar-icon" htmlFor="name"><i className="fa fa-refresh fa-2x"></i></label>
+						<h1 className="top-bar-text">THIS-OR-THAT</h1>
+					</div>
+					<div className="testbox">
+						<SignupForm onUserLogin = {this.handleUserLogin}/>
+						<br/>
+						<LoginForm onUserLogin = {this.handleUserLogin}/>
+					</div>
 				</div>
 			);
 		}
@@ -508,166 +416,10 @@ var LoginSignup = React.createClass({
 });
 
 
-React.render(
-	<LoginSignup />,
-	document.getElementById('content')
-);
-
-
-
-
-/*
-var AppBody = React.createClass({
-	
-	render: function() {
-		return (
-			<h1>App Body : {this.props.username}</h1>
-		);
-	}
-});
-
-var LoginForm = React.createClass({
-	
-	handleLoginSubmit: function(e) {
-		e.preventDefault();
-		var username = React.findDOMNode(this.refs.loginusername).value.trim();
-		if (!username) {
-			return;
-		}
-		
-		//React.findDOMNode(this.refs.loginusername).value = '';
-		// TODO: send request to the server and on response call onUserLogin(response.loginStatus, response.username)
-		$.ajax({
-			url: username + "/check_login/",
-			dataType: 'json',
-			cache: false,
-			success: function(data) {
-				console.log(data.loginStatus);
-				this.props.onUserLogin(data.loginStatus, data.username)
-				//console.log(this.props.loginStatus);
-				alert(this.props.loginStatus);
-				console.log(this.props.loginStatus);
-			}.bind(this),
-			error: function(xhr, status, err) {
-				//console.error(err.toString());
-			}.bind(this)
-		});
-		//console.log("HIIIIIIIII");
-		//console.log(this.state.loginStatus);
-		//return;
-	},
-
-	render: function() {
-        var content = "";
-		if(this.props.loginStatus == true)
-		{
-			content = (
-				<AppBody username = {this.props.username} />
-			);
-		}
-		else
-		{
-			content =  (
-				<form className="loginForm" onSubmit={this.handleLoginSubmit}>
-					<h1>Log in</h1>
-					<input type="text" placeholder="Username" ref="loginusername" />
-					<input type="submit" value="Log in" />
-					<br/>
-					<br/>
-				</form>
-			);
-		}
-		return (
-            <span>{this.props.loginStatus}{content}</span>
-        );
-	}
-});
-
-
-var SignupForm = React.createClass({
-  
-	handleSignupSubmit: function(e) {
-		var username = React.findDOMNode(this.refs.signupusername).value.trim();
-		var age = React.findDOMNode(this.refs.age).value.trim();
-		var income = React.findDOMNode(this.refs.income).value.trim();
-		var riskAppetite = React.findDOMNode(this.refs.riskAppetite).value.trim();
-		var savings = React.findDOMNode(this.refs.savings).value.trim();
-		if (!username) {
-			return;
-		}
-		if (!age ) {
-			return;
-		}
-		if (!income ) {
-			return;
-		}
-		if (!riskAppetite ) {
-			return;
-		}
-		if (!savings ) {
-			return;
-		}
-		// TODO: send request to the server
-		return;
-	},
-
-	render: function() {
-		return (
-			<form className="signupForm" onSubmit={this.handleSignupSubmit}>
-				<br><h1>Sign up</h1></br>
-				Username: <input type="text" ref="signupusername" />
-				<br>Age: <input type="number"  min="18" max="150" ref="age" /></br>
-				<br>Income: <input type="number" step="0.50" min="0" max="10000" ref="income" /></br>
-				<br>Risk Appetite(in %): <input type="number"  min="0" max ="100" step ="0.50" ref="riskAppetite" /></br>
-				<br>Savings(in %): <input type="number"  min="0" max ="100" step="0.50"ref="savings" /></br>
-				<br><input type="submit" value="Sign up" /></br>
-			</form>
-		);
-	}
-});
-
-var LoginSignup = React.createClass({
-	
-	getInitialState: function() {
-        return {
-            loginStatus: false,
-            username: ''
-        };
-    },
-    
-    handleUserLogin: function(loginStatus,username) {
-    	console.log("9999999999999999999999999999999");
-    	console.log(this.isMounted());
-        this.setState({
-            loginStatus: loginStatus,
-            username: username
-        });
-    },
-    
-	render: function() {
-//		if(this.state.loginStatus == true)
-//		{
-//			return (
-//				<AppBody username = {this.state.username} />
-//			);
-//		}
-//		else
-//		{
-			return (
-				<div className="loginSignup">
-					<LoginForm loginStatus = {this.state.loginStatus} username = {this.state.username} onUserLogin = {this.handleUserLogin}/>
-					<h1>OR</h1>
-					<SignupForm />
-				</div>
-			);
-//		}
-	}
-});
 
 
 React.render(
 	<LoginSignup />,
 	document.getElementById('content')
 );
-*/
 
