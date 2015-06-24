@@ -8,7 +8,7 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'tworoads.views.home', name='home'),
     url(r'^this_or_that/', include('this_or_that.urls')),
-    url(r'^polls/', include('polls.urls', namespace="polls")),
+    #url(r'^polls/', include('polls.urls', namespace="polls")),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

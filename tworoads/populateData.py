@@ -15,8 +15,7 @@ with open('fileNames.txt') as fp:
         s.save()
         
         fileNames.append(line)
-print fileNames
-'''
+
 i = 1
 sys.stdout = open("output.csv", "w")
 for fName in fileNames:
@@ -39,4 +38,4 @@ for fName in fileNames:
         print (line[1]),
         i+=1
     f.close()    
-'''    
+  
