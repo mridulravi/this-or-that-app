@@ -310,7 +310,6 @@ var StrategyOption = React.createClass({
 		daterange['labels'] = labelObj;
 		daterange['categories'] = categoriesList;
 		
-		thisID = "Strategy: ".concat(this.props.ID)
 		thisNR = "Net Return: ".concat(this.state.netReturn).concat("%")
 		thisAR = "Annualized Return: ".concat(this.state.annualizedReturn).concat("%")
 		thisMD = "Maximum Drawdown: ".concat(this.state.maxDrawdown).concat("%")
@@ -326,13 +325,14 @@ var StrategyOption = React.createClass({
 							</label>
 						</span>
 						<a className="first-hover">
-							{thisID}
+							{thisNR}
 						</a>
-						<ul className="menu">
-							<li><a>{thisNR}</a></li>
-							<li><a>{thisAR}</a></li>
-							<li><a>{thisMD}</a></li>
-						</ul>
+						<a className="sec-hover">
+							{thisAR}
+						</a>
+						<a className="third-hover">
+							{thisMD}
+						</a>
 					</div>
 				</div>
 			</div>
@@ -340,6 +340,11 @@ var StrategyOption = React.createClass({
 	}
 });
 //<LineChart data={datalist} legend={true} title = "Line Chart"/>
+//<ul className="menu">
+//							<li>{thisNR}</li>
+//							<li><a>{thisAR}</a></li>
+//							<li><a>{thisMD}</a></li>
+//						</ul>
     
 var AppBody = React.createClass({
 	
@@ -413,23 +418,16 @@ var AppBody = React.createClass({
 	render: function() {
 		return (
 			<div>
-				<h1>Hi, {this.props.username}</h1>
 				<div>
 					<StrategyOption ID = {this.state.firstID} />
 				</div>
-				<br/>
-				<br/>
-				<br/>
 				<hr/>
 				<div>
 					<StrategyOption ID = {this.state.secondID} />
 				</div>
-				<br/>
-				<br/>
-				<br/>
 				<hr/>
 				<div >
-					<h2> Pick a strategy:</h2>
+					<h3> Pick a strategy:</h3>
 					<form onSubmit={this.handleRadioSubmit}>
 						<div className="register-switch" >
 							<input type="radio" className="register-switch-input" name="choice" ref="firstRadioButton" id="firstRadioButton" value={this.state.firstID} />
@@ -569,18 +567,37 @@ var LoginSignup = React.createClass({
 	render: function() {
 		if(this.state.loginStatus == true)
 		{
+			if((this.state.username).length > 10){
+				var displayUsername = (this.state.username).substr(0,10)+'...';
+			}
+			else {
+				displayUsername = this.state.username.concat('1234567');
+			}
 			return (
-				<AppBody username = {this.state.username} />
+				<div>
+					<div className="top-bar">
+						<label id="top-bar-icon" htmlFor="name"><i className="fa fa-refresh fa-2x"></i></label>
+						<h1 className="top-bar-text">THIS-OR-THAT</h1>
+						<h2 className="top-bar-user">Logged in: {displayUsername} </h2>
+					</div>
+					<AppBody username = {this.state.username} />
+				</div>
 			);
 		}
 		else
 		{
 			return (
-				<div className="testbox">
-					<SignupForm onUserLogin = {this.handleUserLogin}/>
-					<br/>
-					<LoginForm onUserLogin = {this.handleUserLogin}/>
-					<script type="text/javascript">alert(1);</script>
+				<div>
+					<div className="top-bar">
+						<label id="top-bar-icon" htmlFor="name"><i className="fa fa-refresh fa-2x"></i></label>
+						<h1 className="top-bar-text">THIS-OR-THAT</h1>
+					</div>
+					<div className="testbox">
+						<SignupForm onUserLogin = {this.handleUserLogin}/>
+						<br/>
+						<LoginForm onUserLogin = {this.handleUserLogin}/>
+						<script type="text/javascript">alert(1);</script>
+					</div>
 				</div>
 			);
 		}
