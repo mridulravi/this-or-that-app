@@ -1,0 +1,114 @@
+#########################################################################################
+           PREFACE
+################################
+
+I have used 
+	Django-Python framework for developing the backend of the application.
+	mysql is used for data storage
+	React for front-end
+	
+While django allows us to create the database schema(i.e. the TABLES) from the code, 
+to populate the database some work needs to be done. I was given the daily log returns for
+149 strategies in the form of csv files. Whereas my database model contains 4 tables:
+
+	i.   this_or_that_strategy
+	ii.  this_or_that_data
+	iii. this_or_that_user
+	iv.  this_or_that_selects
+
+(To know more about the fields and structure of these tables, please read the design document 
+I submitted on June 17.)
+
+An entry in the this_or_that_user is created when the a user signs-up for the app.
+An entry in the this_or_that_selects is created when the a user selects a stratgy.
+But entries in the this_or_that_strategy and this_or_that_data need to be populated by the admin 
+by using the 149 CSV files data. The following steps do this job. It would help if you read: 
+https://docs.djangoproject.com/en/1.5/intro/tutorial01/
+
+In case of any problems, feel free contact me anytime at: 
+mridulravi@gmail.com
+Phone: 09930718082
+
+
+#########################################################################################
+     SET-UP INSTRUCTIONS
+################################
+
+Following is the step-wise procedure for setting up this-or-that app on your local machine
+(Assuming that you have Python-2.7.3 and Django-1.5.2 installed already):
+
+1. Download/clone the repostitory: https://github.com/mridulravi/this-or-that-app
+
+2. Open terminal and change directory as follows:
+	
+		cd this-or-that-app/tworoads
+
+3. Now run the following command
+	
+		./manage.py syncdb
+
+	You’ll see a message for each database table it creates, and you’ll get a prompt asking you if you’d like to create a superuser account for the authentication system. Go ahead and do that (use username: root and password: 123456789)
+	
+4. Run the command-line client for mysql as follows:
+	
+		mysql -u root -p
+	
+	When prompted enter password: 123456789
+
+5. Run the following commands in-order in the mysql client:
+
+		USE tworoadsDB;
+		DELETE FROM this_or_that_selects;
+		DELETE FROM this_or_that_data;
+		DELETE FROM this_or_that_user;
+		DELETE FROM this_or_that_strategy;
+		ALTER TABLE this_or_that_strategy AUTO_INCREMENT = 1;
+		ALTER TABLE this_or_that_data AUTO_INCREMENT = 1;
+		quit
+
+6. Run the command(this will start a django-python shell in the terminal):
+
+		./manage.py shell
+
+7. In the opened python shell run the command: 
+	
+		execfile('populateData.py')
+		
+	Wait for some time(5-6 seconds). This will generate a file named output.csv (of size 33.6 MB). DO NOT OPEN THIS FILE IN EDITOR.
+	Close the shell by CTRL-D.
+
+8. If the shell above is closed by CTRL-D then run the following command in the terminal:
+	
+		sed -i '$ d' output.csv
+	
+	This command will remove the last line from output.csv.(Since CTRL-D generates a '>>>>' it will be apended to end of output.csv). If you use any other command to close the python shell, please have a look at last 10-lines of the file by running command: watch tail -n 10 output.csv and remove any lines that are not a CSV line. Basically the file must have 757709 lines. 
+
+9. Now run the following command on terminal to open the mysql client again:
+	
+		mysql --local-infile -u root -p
+		(When prompted, enter password: 123456789)
+
+10. Now open sqlScript.txt and change the location of output.csv according to where your output.csv is located with respect to mysql directory on your machine. (It is currently configured according to my file system) 
+
+11. In the mysql client run following two commands in-order: 
+
+		USE tworoadsDB;
+
+		source sqlScript.txt
+		(This might take ~35 sec to complete)
+
+		quit
+
+12. Now everything is set-up. You can run the following command to start the app:
+
+		./manage.py runserver
+
+	Open a web browser(preferably Google Chrome) and open the URL: http://127.0.0.1:8000/this_or_that/
+
+	Sign-up using any alpha-numeric([a-zA-Z_]) username and other details
+	Close or refresh to log out
+
+#################################################################################
+PS : The app uses some third-party applications/plugins for CSS, Charts and React
+	 and therefore needs internet access.
+
