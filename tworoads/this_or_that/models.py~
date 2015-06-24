@@ -13,15 +13,15 @@ class Strategy(models.Model):
     def getNetReturn(self):
     	s = Data.objects.filter(strategyID=self.id).aggregate(Sum('logReturn'))
     	nr = float(((math.exp(s['logReturn__sum']))-1)*100)
-    	print "@@@@@@"
-    	print nr
+#    	print "@@@@@@"
+#    	print nr
     	return round(nr,2)  
 	
     def getAnnualizedReturn(self):
     	a = Data.objects.filter(strategyID=self.id).aggregate(Avg('logReturn'))
     	ar = float(((math.exp(252*a['logReturn__avg']))-1)*100)
-    	print "#####"
-    	print ar
+#    	print "#####"
+#    	print ar
     	return round(ar,2)
 		
     def getMaxDrawdown(self):
@@ -31,17 +31,32 @@ class Strategy(models.Model):
     	maxDiff = 0
     	leftPeak = 1
     	mdd = 0
+    	firstTime = True
     	for d in data:
             this = prev*math.exp(d.logReturn)
-            maxOnleft = max(maxOnleft,prev)
+            if firstTime==True:
+                firstTime = False
+                maxOnleft = 0
+            else:
+#            	maxOnleft = max(maxOnleft,prev)
+                if(prev > maxOnleft):
+            	    maxOnleft = prev
+            print (this),
+            print (maxOnleft)
+            prev = this
             if(maxOnleft-this > maxDiff):
-            	leftPeak = maxOnleft
-            	maxDiff = maxOnleft - this
-        	prev = this
+                print "HIIIIIIIII"
+                leftPeak = maxOnleft
+                maxDiff = maxOnleft - this
+                thisOne = this
         mdd = float(float(maxDiff/leftPeak)*100)
-        print "*****"
-        print mdd     
-    	return round(maxDiff,2)     	
+        print "***************"
+        print mdd
+        print leftPeak
+        print thisOne
+        print maxDiff
+        print "~~~~~~~~~~~~~~"     
+    	return round(mdd,2)     	
     	  
 
 class Data(models.Model):
