@@ -1,8 +1,8 @@
 from django.db import models
 from django.db.models import Sum,Avg
 import math
-import ast
-import json
+#import ast
+#import json
 
 class Strategy(models.Model):
     strategyName = models.CharField(max_length=10)
@@ -13,15 +13,11 @@ class Strategy(models.Model):
     def getNetReturn(self):
     	s = Data.objects.filter(strategyID=self.id).aggregate(Sum('logReturn'))
     	nr = float(((math.exp(s['logReturn__sum']))-1)*100)
-#    	print "@@@@@@"
-#    	print nr
     	return round(nr,2)  
 	
     def getAnnualizedReturn(self):
     	a = Data.objects.filter(strategyID=self.id).aggregate(Avg('logReturn'))
     	ar = float(((math.exp(252*a['logReturn__avg']))-1)*100)
-#    	print "#####"
-#    	print ar
     	return round(ar,2)
 		
     def getMaxDrawdown(self):
@@ -38,24 +34,13 @@ class Strategy(models.Model):
                 firstTime = False
                 maxOnleft = 0
             else:
-#            	maxOnleft = max(maxOnleft,prev)
                 if(prev > maxOnleft):
             	    maxOnleft = prev
-            print (this),
-            print (maxOnleft)
             prev = this
             if(maxOnleft-this > maxDiff):
-                print "HIIIIIIIII"
                 leftPeak = maxOnleft
                 maxDiff = maxOnleft - this
-                thisOne = this
         mdd = float(float(maxDiff/leftPeak)*100)
-        print "***************"
-        print mdd
-        print leftPeak
-        print thisOne
-        print maxDiff
-        print "~~~~~~~~~~~~~~"     
     	return round(mdd,2)     	
     	  
 
@@ -65,7 +50,6 @@ class Data(models.Model):
     logReturn = models.FloatField()
     
     class Meta:
-        #abstract = True
         unique_together = ('strategyID', 'date')
         ordering = ['date']
         
